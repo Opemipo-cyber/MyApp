@@ -1,155 +1,248 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.VisualBasic;
 
-// ===== CLASSES =====
-
-public class Book
+class student
 {
-    public string ISBN { get; set; }
-    public string Title { get; set; }
-    public string Author { get; set; }
-    public string Category { get; set; }
-    public bool IsAvailable { get; set; }
+    public  int                  Id                { get; set; }
+    public string                Name              { get; set; }
+    public string                Department        { get; set; }
+    public int                   Age               { get; set; }
+    public List<int>            Grades            { get; set; }
+    public List<string>          Courses           { get; set; }
+    public double            Average => Grades.Average();
+    public bool              passed => Average >= 50;
+
 }
 
-public class Member
+      // Flitering using Where
+class program
 {
-    public int MemberId { get; set; }
-    public string Name { get; set; }
+    static void Main()
+    {
+       List<Student> students = new List<Student>
+       {
+          new Student
+          {
+               Id = 1,
+               Name = "James",
+               Department = " Science",
+               Age = 20,
+               Grades = new List<int>{70, 65, 80},
+               Courses = new List<string>{ "Math", "physics"},
+            },
+            new Student
+           {
+                Id = 2,
+                Name = "Amara",
+                Department = " Art",
+                Age = 21,
+                Grades = new List<int>{40, 45, 50},
+                Courses = new List<string>{ "literature", "History"},
+            },
+            new Student
+            {
+                Id = 3,
+                Name = "Ngozi",
+                Department = " Commercce",
+                Age = 22,
+                Grades = new List<int>{35, 40, 45},
+                Courses = new List<string>{ "Accounting", "Economics"},
+            },
+            new Student
+            {
+                 Id = 4,
+                 Name = "Mike",
+                 Department = " Science",
+                 Age = 19,
+                 Grades = new List<int>{85, 90, 88},
+                 Courses = new List<string>{ "Math", "physics"},
+            }
+        };
+         //students who passed
+        var passedStudents = students.Where(s => s.passed);
+        Console.WriteLine("Students who passed:");
+        foreach ( var student in passedStudents)
+        {
+            Console.WriteLine($"{student.Name}, Average: {student.Average: F2}");
+        }
+         // Science students whoses age is uder 22
+         var ScienceStudents = students.Where(s => s.Department == "Science" && s.Age < 22);
+         Console.WriteLine("\nScience Students Aged under 22: ");
+         foreach ( var student in ScienceStudents)
+        {
+            Console.WriteLine($"{student.Name}, Age: {student.Age: }");
+        }
+        
+        //Select
+        var Summary = students.Select(s => new { s.Name, s.Average, s.status, pass >= 50});
+        foreach (var student in Summary)
+        {
+            Console.WriteLine($"{student.Name}, {student.Average: F2}, {(student.pass ? "PASS" : "FAIL")}");
+        }
+        // Select many
+        var allcourses = students.SelectMany(s => s.Courses);
+         
+         var uniquecourses =students
+            .SelectMany(s => s.Courses)
+            .Distinct();
+
+            Console.WriteLine("All Unique Courses:");
+            foreach (var Course in uniquecourses)
+            {
+                Console.WriteLine(course);
+            }
+            //count them
+            int count = uniquecourses();
+            Console.WriteLine($"\nTotal Unique Courses");
+
+            //Ordering
+            var byrankDecThenName = students
+                .OrderByDescending(s => s.Average)
+                .ThenBy(s => s.Name);
+            
+            Console.WriteLine("Student Ranking: \n");
+            int rank = 1;
+            foreach (var student in byrankDecThenName)
+            {
+               Console.WriteLine($"{rank}. {student.Name} - avg: {student.Average: F2}"); 
+            }
+            //Groupby
+            var byDept = students
+                .GroupBy(s => s.Department)
+                .Select(g => new
+                {
+                     Department = g.Key,
+                     Count      = g.Count(),
+                     AverageGrade    = g.Average(s => s.Average),
+                     PassRate    = g.Count(s => s.passed) * 100.0 / g.Count()
+                });
+            foreach (var dept in byDept)
+            {
+             Console.WriteLine($"{dept.Department}: {dept.Count} students, avg {dept.Average:F2}, {dept.PassRate:F2}");
+            }
+            //Aggregation
+            int totalStudents = students.Count;
+            double overallAverage = allGrades.Average();
+            int highestGrade = allGrades.Max();
+            int lowestGrade = allGrades.Min();
+            int passCount = students.Count(s => s.Passed);
+            int failCount = students.Count(s => !s.Passed);
+
+            Console.Write("School-Wide Statistics:");
+            Console.WriteLine($"Total Students: {totalStudents}, Overall Average Grade: {overallAverage:F2}");
+            Console.WriteLine($"Highest Grade: {highestGrade}, Lowest Grade: {lowestGrade}");
+            Console.WriteLine($"Pass Count: {passCount}, Fail Count: {failCount}");
+            
+            //partioning
+            var top3 = students
+                .OrderByDescending(s => s.Grade)
+                .Take(3);
+
+              Console.WriteLine("Top 3 Students:\n");
+                foreach (var s in top3)
+                  {
+                      Console.WriteLine($"{s.Name} - {s.Average:F2}");
+                  }
+            // Bottom 3
+            var bottom3 = students
+                .OrderBy(s => s.Grade)
+                .Take(3);
+             foreach (var s in bottom3)
+                 {
+                     Console.WriteLine($"{s.Name} - {s.Average:F2}");
+                 }
+                 Console.WriteLine("Page 4: " + string.Join(", ", page4));
+
+        string[] morningClass = { "James", "Amara", "Ngozi" };
+        string[] eveningClass = { "Ngozi", "Mike", "James" }; 
+
+            //Set operation   Students in both classes
+            var both = morningClass.Intersect(eveningClass);
+            Console.WriteLine("Students in Both Classes:");
+             foreach (var student in both)
+               {
+                  Console.WriteLine(student);
+               }
+           
+            // Students only in morning class
+            var onlyMorning = morningClass.Except(eveningClass);
+            Console.WriteLine("\nStudents Only in Morning Class:");
+             foreach (var student in onlyMorning)
+              {
+                 Console.WriteLine(student);
+              }
+            
+            // Students only in evening class
+            var onlyEvening = eveningClass.Except(morningClass);
+             Console.WriteLine("\nStudents Only in Evening Class:");
+               foreach (var student in onlyEvening)
+                {
+                   Console.WriteLine(student);
+                }
+
+            // All unique students
+            var allStudents = morningClass.Union(eveningClass);
+            Console.WriteLine("\nAll Unique Students:");
+             foreach (var student in allStudents)
+              {
+                 Console.WriteLine(student);
+              }
+        
+        //Quantifiers
+          List<Student> students = new List<Student>
+        {
+            new Student { Name = "James", Grades = new List<int>{70, 65, 80} },
+            new Student { Name = "Amara", Grades = new List<int>{40, 45, 50} },
+            new Student { Name = "Mike", Grades = new List<int>{85, 90, 100} },
+            new Student { Name = "Ngozi", Grades = new List<int>{35, 40, 45} }
+        };
+
+        // Does any student have a perfect score (100)?
+        bool hasPerfectScore = students.Any(s => s.Grades.Contains(100));
+
+        // Do all students have at least one grade above 40?
+        bool allAbove40 = students.All(s => s.Grades.Any(g => g > 40));   
+
+        // Is student "Usman" in the list?
+        bool hasUsman = students.Any(s => s.Name == "Usman");
+
+        Console.WriteLine($"Any student with a score of 100? {hasPerfectScore}");
+        Console.WriteLine($"Do all students have at least one grade above 40? {allAbove40}");
+        Console.WriteLine($"Is Usman in the list? {hasUsman}");
+
+        //Conversion
+        List<Student> students = GetStudents();
+          {
+            new Student { Id = 1, Name = "James", Department = "Engineering", Grades = new List<int>{70,65,80} };
+            new Student { Id = 2, Name = "Amara", Department = "Science", Grades = new List<int>{40,45,50} };
+            new Student { Id = 3, Name = "Mike", Department = "Engineering", Grades = new List<int>{85, 90, 100} };
+          }
+          
+        // Convert to Dictionary
+        Dictionary<int, Student> studentDict = students.ToDictionary(s => s.Id);
+        Console.WriteLine(studentDict[2].Name);
+       
+        //Build a lookup by Department
+        ILookup<string, Student> byDept = students
+            .ToLookup(s => s.Department);
+
+        Console.WriteLine("\nEngineering Students:");
+
+        foreach (var student in studentDict["Engineering"])
+        {
+            Console.WriteLine($"{student.Name} - Avg: {student.Average:F2}");
+        }
+          
+    }
 }
 
-//  LIBRARY MANAGEMENT SYSTEM 
+    
+    
 
-public class Library
-{
-    private List<Book> allBooks = new List<Book>();
-    private Dictionary<string, Book> isbnLookup = new Dictionary<string, Book>();
-    private Queue<Member> borrowRequests = new Queue<Member>();
-    private Stack<string> actionHistory = new Stack<string>();
-    private HashSet<string> bookCategories = new HashSet<string>();
+             
 
-    // 1. Add a Book
-    public void AddBook(Book book)
-    {
-        allBooks.Add(book);
-        isbnLookup[book.ISBN] = book;
-        bookCategories.Add(book.Category);
-        actionHistory.Push($"Added book: {book.Title}");
-        Console.WriteLine($"Book '{book.Title}' added successfully.");
-    }
-
-    // 2. Remove a Book
-    public void RemoveBook(string isbn)
-    {
-        if (isbnLookup.ContainsKey(isbn))
-        {
-            Book book = isbnLookup[isbn];
-            allBooks.Remove(book);
-            isbnLookup.Remove(isbn);
-            actionHistory.Push($"Removed book: {book.Title}");
-            Console.WriteLine($"Book '{book.Title}' removed successfully.");
-        }
-        else
-        {
-            Console.WriteLine("Book not found.");
-        }
-    }
-
-    // 3. Find a Book
-    public void FindBook(string isbn)
-    {
-        if (isbnLookup.ContainsKey(isbn))
-        {
-            Book b = isbnLookup[isbn];
-            Console.WriteLine($"\n--- Book Found ---");
-            Console.WriteLine($"ISBN     : {b.ISBN}");
-            Console.WriteLine($"Title    : {b.Title}");
-            Console.WriteLine($"Author   : {b.Author}");
-            Console.WriteLine($"Category : {b.Category}");
-            Console.WriteLine($"Status   : {(b.IsAvailable ? "Available" : "Borrowed")}");
-        }
-        else
-        {
-            Console.WriteLine("Book not found.");
-        }
-    }
-
-    // 4. Request to Borrow a Book
-    public void RequestBorrow(int memberId, string memberName)
-    {
-        Member member = new Member { MemberId = memberId, Name = memberName };
-        borrowRequests.Enqueue(member);
-        Console.WriteLine($"Borrow request added for '{memberName}'.");
-    }
-
-    // 5. Process Next Borrow Request
-    public void ProcessNextBorrow()
-    {
-        if (borrowRequests.Count > 0)
-        {
-            Member member = borrowRequests.Dequeue();
-            Console.WriteLine($"Processing borrow request for: {member.Name} (ID: {member.MemberId})");
-        }
-        else
-        {
-            Console.WriteLine("No pending borrow requests.");
-        }
-    }
-
-    // 6. Undo Last Action
-    public void UndoLastAction()
-    {
-        if (actionHistory.Count > 0)
-        {
-            string lastAction = actionHistory.Pop();
-            Console.WriteLine($"Undo: {lastAction}");
-        }
-        else
-        {
-            Console.WriteLine("No actions to undo.");
-        }
-    }
-
-    // 7. Display All Unique Categories
-    public void DisplayCategories()
-    {
-        Console.WriteLine("\n--- Unique Categories ---");
-        foreach (string cat in bookCategories)
-            Console.WriteLine($"  - {cat}");
-    }
-
-    // 8. Display All Books
-    public void DisplayAllBooks()
-    {
-        Console.WriteLine("\n--- All Books ---");
-        if (allBooks.Count == 0) { Console.WriteLine("No books in library."); return; }
-        foreach (Book b in allBooks)
-            Console.WriteLine($"[{b.ISBN}] {b.Title} by {b.Author} | {b.Category} | {(b.IsAvailable ? "Available" : "Borrowed")}");
-    }
-
-    // 9. Display Books Sorted by Title
-    public void DisplayBooksSortedByTitle()
-    {
-        Console.WriteLine("\n--- Books Sorted by Title ---");
-        var sorted = allBooks.OrderBy(b => b.Title).ToList();
-        foreach (Book b in sorted)
-            Console.WriteLine($"{b.Title} by {b.Author}");
-    }
-
-    // 10. Library Statistics
-    public void DisplayStatistics()
-    {
-        int total = allBooks.Count;
-        int available = allBooks.Count(b => b.IsAvailable);
-        int borrowed = total - available;
-        int uniqueCats = bookCategories.Count;
-
-        Console.WriteLine("\n--- Library Statistics ---");
-        Console.WriteLine($"Total Books        : {total}");
-        Console.WriteLine($"Available Books    : {available}");
-        Console.WriteLine($"Borrowed Books     : {borrowed}");
-        Console.WriteLine($"Unique Categories  : {uniqueCats}");
-    }
-}
-
+      
+ 
